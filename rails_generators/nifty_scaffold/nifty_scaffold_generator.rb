@@ -38,6 +38,9 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
         @attributes << Rails::Generator::GeneratedAttribute.new('name', 'string')
       end
     end
+    
+    # make haml default
+    options[:haml] = true unless options[:erb]
   end
   
   def manifest
