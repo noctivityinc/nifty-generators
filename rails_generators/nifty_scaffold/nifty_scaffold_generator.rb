@@ -77,22 +77,22 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
         m.directory "app/views#{namespace_dir}/#{plural_name}"
         controller_actions.each do |action|
           if File.exist? source_path("views/#{view_language}/#{action}.html.#{view_language}")
-            m.template "views/#{view_language}/#{action}.html.#{view_language}", "app/views/#{plural_name}/#{action}.html.#{view_language}"
+            m.template "views/#{view_language}/#{action}.html.#{view_language}", "app/views#{namespace_dir}/#{plural_name}/#{action}.html.#{view_language}"
           end
         end
 
         if form_partial?
-          m.template "views#{namespace_dir}/#{view_language}/_form.html.#{view_language}", "app/views/#{plural_name}/_form.html.#{view_language}"
+          m.template "views/#{view_language}/_form.html.#{view_language}", "app/views#{namespace_dir}/#{plural_name}/_form.html.#{view_language}"
         end
 
-        m.route_namespaced_resources namespace.intern, plural_name
+        m.route_namespaced_resources namespace, plural_name
 
         if rspec?
           m.directory "spec/controllers#{namespace_dir}"
-          m.template "tests#{namespace_dir}/#{test_framework}/controller.rb", "spec/controllers/#{plural_name}_controller_spec.rb"
+          m.template "tests#{namespace_dir}/#{test_framework}/controller.rb", "spec/controllers#{namespace_dir}/#{plural_name}_controller_spec.rb"
         else
           m.directory "test/functional#{namespace_dir}"
-          m.template "tests#{namespace_dir}/#{test_framework}/controller.rb", "test/functional/#{plural_name}_controller_test.rb"
+          m.template "tests#{namespace_dir}/#{test_framework}/controller.rb", "test/functional#{namespace_dir}/#{plural_name}_controller_test.rb"
         end
 
         unless options[:skip_javascript]
@@ -148,6 +148,14 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
       "#{namespace}_#{plural_name}"
     else
       plural_name
+    end
+  end
+  
+  def form_path
+    if use_namespace?
+      "[:#{namespace}, @#{singular_name}]"
+    else
+      "@#{singular_name}"
     end
   end
 
