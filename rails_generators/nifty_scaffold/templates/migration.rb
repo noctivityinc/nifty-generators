@@ -7,7 +7,7 @@ class Create<%= plural_model_name %> < ActiveRecord::Migration
     <%- unless options[:skip_timestamps] -%>
       t.timestamps
     <%- end -%>
-    <%- if options[:include_timestamps] -%>
+    <%- if options[:include_userstamps] -%>
       t.userstamps
     <%- end -%>
     end

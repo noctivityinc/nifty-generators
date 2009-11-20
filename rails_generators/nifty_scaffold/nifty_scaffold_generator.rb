@@ -51,7 +51,11 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
         m.directory "app/models"
         m.template "model.rb", "app/models/#{singular_name}.rb"
         unless options[:skip_migration]
-          m.migration_template "migration.rb", "db/migrate", :migration_file_name => "create_#{plural_name}"
+          if use_namespace?
+            m.migration_template "migration.rb", "db/migrate", :migration_file_name => "create_#{namespace}_#{plural_name}"
+          else
+            m.migration_template "migration.rb", "db/migrate", :migration_file_name => "create_#{plural_name}"
+          end
         end
 
         if rspec?
@@ -89,10 +93,10 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
 
         if rspec?
           m.directory "spec/controllers#{namespace_dir}"
-          m.template "tests#{namespace_dir}/#{test_framework}/controller.rb", "spec/controllers#{namespace_dir}/#{plural_name}_controller_spec.rb"
+          m.template "tests/#{test_framework}/controller.rb", "spec/controllers#{namespace_dir}/#{plural_name}_controller_spec.rb"
         else
           m.directory "test/functional#{namespace_dir}"
-          m.template "tests#{namespace_dir}/#{test_framework}/controller.rb", "test/functional#{namespace_dir}/#{plural_name}_controller_test.rb"
+          m.template "tests/#{test_framework}/controller.rb", "test/functional#{namespace_dir}/#{plural_name}_controller_test.rb"
         end
 
         unless options[:skip_javascript]
@@ -286,6 +290,12 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
         "#{match}\n  map.namespace(:#{namespace}) do |#{namespace}|\n     #{namespace}.resources #{resource_list}\n  end\n"
       end
     end
+  end
+
+  def gsub_file(relative_destination, regexp, *args, &block)
+    path = destination_path(relative_destination)
+    content = File.read(path).gsub(regexp, *args, &block)
+    File.open(path, 'wb') { |file| file.write(content) }
   end
 
   def add_options!(opt)
