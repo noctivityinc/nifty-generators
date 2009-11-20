@@ -14,7 +14,7 @@
       |
       <%- end -%>
       <%- if action? :destroy -%>
-      = link_to "Destroy", @<%= namespace_path %>, :confirm => 'Are you sure?', :method => :delete
+      = link_to "Destroy", <%= form_path %>, :confirm => 'Are you sure?', :method => :delete
       |
       <%- end -%>
       <%- if action? :index -%>

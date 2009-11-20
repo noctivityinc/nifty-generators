@@ -1,5 +1,6 @@
 class <%= plural_class_name %>Controller < ApplicationController
   before_filter :get_<%=singular_name %>, :except => [:index, :new, :create] 
+  
   <%= controller_methods :actions %>
   
   private 

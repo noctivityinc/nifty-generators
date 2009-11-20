@@ -150,7 +150,7 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
       plural_name
     end
   end
-  
+
   def form_path
     if use_namespace?
       "[:#{namespace}, @#{singular_name}]"
@@ -199,6 +199,14 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
     else
       read_template("views/#{view_language}/_form.html.#{view_language}")
     end
+  end
+
+  def action_col_span
+    x = 0
+    x += 1 if action? :show
+    x += 1 if action? :edit
+    x += 1 if action? :destroy
+    x
   end
 
   def items_path(suffix = 'path')
