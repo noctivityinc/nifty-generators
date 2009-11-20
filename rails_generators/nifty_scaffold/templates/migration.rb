@@ -1,4 +1,4 @@
-class Create<%= plural_class_name %> < ActiveRecord::Migration
+class Create<%= plural_model_name %> < ActiveRecord::Migration
   def self.up
     create_table :<%= plural_name %> do |t|
     <%- for attribute in attributes -%>

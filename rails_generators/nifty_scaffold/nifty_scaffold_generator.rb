@@ -6,7 +6,7 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
     usage if @args.empty?
 
     @name = @args.first
-    @name, @namespace = @name.split('::') if @name =~ /::/ # => handle namespaces
+    @namespace, @name = @name.split('::') if @name =~ /::/ # => handle namespaces
 
     @controller_actions = []
     @attributes = []
@@ -85,7 +85,7 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
           m.template "views#{namespace_dir}/#{view_language}/_form.html.#{view_language}", "app/views/#{plural_name}/_form.html.#{view_language}"
         end
 
-        m.route_namespaced_resources namespace, plural_name
+        m.route_namespaced_resources namespace.intern, plural_name
 
         if rspec?
           m.directory "spec/controllers#{namespace_dir}"
@@ -93,6 +93,11 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
         else
           m.directory "test/functional#{namespace_dir}"
           m.template "tests#{namespace_dir}/#{test_framework}/controller.rb", "test/functional/#{plural_name}_controller_test.rb"
+        end
+
+        unless options[:skip_javascript]
+          m.directory "public/javascripts/controllers#{namespace_dir}"
+          File.open("public/javascripts/controllers#{namespace_dir}/#{plural_name}.js", 'a') {|f| f.write("") }
         end
       end
     end
@@ -124,7 +129,7 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
 
   def namespace_path
     if use_namespace?
-      "[#{namespace}, #{singular_name}]"
+      "[:#{namespace}, #{singular_name}]"
     else
       singular_name
     end
@@ -135,6 +140,14 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
       "#{namespace}_#{singular_name}"
     else
       singular_name
+    end
+  end
+
+  def plural_path
+    if use_namespace?
+      "#{namespace}_#{plural_name}"
+    else
+      plural_name
     end
   end
 
@@ -151,6 +164,14 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
   end
 
   def plural_class_name
+    if use_namespace?
+      "#{namespace.camelize}::#{plural_name.camelize}"
+    else
+      plural_name.camelize
+    end
+  end
+
+  def plural_model_name
     plural_name.camelize
   end
 
@@ -174,7 +195,11 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
 
   def items_path(suffix = 'path')
     if action? :index
-      "#{plural_name}_#{suffix}"
+      if use_namespace?
+        "#{namespace}_#{plural_name}_#{suffix}"
+      else
+        "#{plural_name}_#{suffix}"
+      end
     else
       "root_#{suffix}"
     end
@@ -182,7 +207,11 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
 
   def item_path(suffix = 'path')
     if action? :show
-      "@#{singular_name}"
+      if use_namespace?
+        "[:#{namespace}, @#{singular_name}]"
+      else
+        "@#{singular_name}"
+      end
     else
       items_path(suffix)
     end
@@ -246,6 +275,7 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
     opt.on("--skip-migration", "Don't generate migration file for model.") { |v| options[:skip_migration] = v }
     opt.on("--skip-timestamps", "Don't add timestamps to migration file.") { |v| options[:skip_timestamps] = v }
     opt.on("--skip-controller", "Don't generate controller, helper, or views.") { |v| options[:skip_controller] = v }
+    opt.on("--skip-javascript", "Don't generate a blank javascript file for the controller") { |v| options[:skip_javascript] = v }
     opt.on("--invert", "Generate all controller actions except these mentioned.") { |v| options[:invert] = v }
     opt.on("--haml", "Generate HAML views instead of ERB.") { |v| options[:haml] = v }
     opt.on("--include-userstamps", "Add t.userstamps to model.") { |v| options[:include_userstamps] = v }

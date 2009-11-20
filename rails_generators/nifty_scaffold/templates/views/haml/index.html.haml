@@ -23,5 +23,5 @@
           <%- end -%>
 
     <%- if actions? :new -%>
-    %p= link_to "New <%= singular_name.titleize %>", new_<%= singular_path %>_path
+    %p= link_to "+ New <%= singular_name.titleize %>", new_<%= singular_path %>_path
     <%- end -%>
