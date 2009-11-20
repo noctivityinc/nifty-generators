@@ -180,7 +180,11 @@ class NiftyScaffoldGenerator < Rails::Generator::Base
   end
 
   def plural_model_name
-    plural_name.camelize
+    if use_namespace?
+      "#{namespace.camelize}#{plural_name.camelize}"
+    else
+      plural_name.camelize
+    end
   end
 
   def controller_methods(dir_name)
