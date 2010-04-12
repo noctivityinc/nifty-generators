@@ -1,10 +1,10 @@
 Gem::Specification.new do |s|
   s.name = "nifty-generators"
-  s.summary = "A collection of useful Rails generator scripts."
-  s.description = "A collection of useful Rails generator scripts for scaffolding, layout files, authentication, and more."
+  s.summary = "A collection of useful Rails generator scripts. Fork from RyanB."
+  s.description = "A collection of useful Rails generator scripts for scaffolding, layout files, authentication, and more.  Fork includes support for namespacing"
   s.homepage = "http://github.com/ryanb/nifty-generators"
   
-  s.version = "0.3.2"
+  s.version = "0.3.2.1"
   s.date = "2010-02-16"
   
   s.authors = ["Ryan Bates"]
